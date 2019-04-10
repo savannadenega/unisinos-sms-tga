@@ -1,8 +1,11 @@
-module.exports = class Arc{
-    constructor(weight = 1, transition, place){
-        this.weight = weight;
+module.exports = class Arc {
+    constructor(transition, place, weight = 1) {
         this.transition = transition;
         this.place = place;
+        this.weight = weight;
+    }
+
+    canFire(){
+        return this.place.marks >= this.weight;
     }
 }
-
