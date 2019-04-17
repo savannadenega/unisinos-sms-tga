@@ -1,12 +1,13 @@
 package model;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Place implements NetworkNode {
 	private int tokenCount;
 	private String name;
-	private List<Arc> outputArcs;
+	private List<Arc> outputArcs = new ArrayList<Arc>();
 	private Arc destination;
 
 	public Place() {
@@ -16,12 +17,6 @@ public class Place implements NetworkNode {
 	public Place(int tokenCount, String name) {
 		this.tokenCount = tokenCount;
 		this.name = name;
-	}
-
-	public Place(int tokenCount, String name, List<Arc> outputArcs) {
-		this(tokenCount, name);
-
-		this.outputArcs = outputArcs;
 	}
 
 	/**
@@ -38,9 +33,9 @@ public class Place implements NetworkNode {
 	private Arc defineRandomDestination() {
 		int randomIndex = 0;
 
-		randomIndex = ThreadLocalRandom.current().nextInt(0, this.getoutputArcs().size() + 1);
+		randomIndex = ThreadLocalRandom.current().nextInt(0, this.getOutputArcs().size() + 1);
 
-		return this.getoutputArcs().get(randomIndex);
+		return this.getOutputArcs().get(randomIndex);
 	}
 
 	public void addTokens(int tokenCount) {
@@ -67,11 +62,16 @@ public class Place implements NetworkNode {
 		return this.name;
 	}
 
-	public void setoutputArcs(List<Arc> outputArcs) {
-		this.outputArcs = outputArcs;
+	public List<Arc> getOutputArcs() {
+		return this.outputArcs;
 	}
 
-	public List<Arc> getoutputArcs() {
-		return this.outputArcs;
+	public void addOutputArc(Arc arc){
+		this.outputArcs.add(arc);
+	}
+
+	@Override
+	public String toString(){
+		return this.name;
 	}
 }

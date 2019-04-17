@@ -1,18 +1,16 @@
 package model;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class Transition implements NetworkNode {
+	private String name;
 	private int tokenCount;
-	private List<Arc> inputs, outputs;
+	private List<Arc> inputs = new ArrayList<Arc>();
+	private List<Arc> outputs = new ArrayList<Arc>();
 
-	public Transition() {
-
-	}
-
-	public Transition(List<Arc> inputs, List<Arc> outputs) {
-		this.inputs = inputs;
-		this.outputs = outputs;
+	public Transition(String name) {
+		this.name = name;
 	}
 
 	public boolean canFire() {
@@ -20,12 +18,13 @@ public class Transition implements NetworkNode {
 			minTokenCount = 0,
 			inputTokenCount = 0;
 
-		for (int index = 0; index < this.getOutputs().size(); index++)
-			minTokenCount += this.getOutputs().get(index).getWeight();
+		for (Arc arc : this.getOutputs()){
+			minTokenCount += arc.getWeight();
+		}
 
-		for (int index = 0; index < this.getInputs().size(); index++)
-			if (this.getInputs().get(index).canFire())
-				inputTokenCount += this.getInputs().get(index).getWeight();
+		for (Arc arc : this.getInputs()){
+			inputTokenCount += (arc.canFire()) ? arc.getWeight() : 0; 
+		}
 
 		return inputTokenCount >= minTokenCount;
 	}
@@ -36,13 +35,15 @@ public class Transition implements NetworkNode {
 	public void fire() {
 		int maxTokenCountSent = 0;
 
-		for (int index = 0; index < this.getOutputs().size(); index++) {
-			if (this.getOutputs().get(index).getWeight() > maxTokenCountSent)
-				maxTokenCountSent = this.getOutputs().get(index).getWeight();
-			
-			this.getOutputs().get(index).fire();
+		for(Arc arc : this.getInputs()){
+			arc.fire();
 		}
 
+		for(Arc arc : this.getOutputs()){
+			maxTokenCountSent = (arc.getWeight() > maxTokenCountSent) ? arc.getWeight() : maxTokenCountSent;
+			arc.fire();
+		}
+		
 		this.removeTokens(maxTokenCountSent);
 	}
 
@@ -62,20 +63,20 @@ public class Transition implements NetworkNode {
 		return this.tokenCount;
 	}
 
-	public void setInputs(List<Arc> inputs) {
-		this.inputs = inputs;
-	}
-
 	public List<Arc> getInputs() {
 		return this.inputs;
 	}
 
-	public void setOutputs(List<Arc> outputs) {
-		this.outputs = outputs;
-	}
-
 	public List<Arc> getOutputs() {
 		return this.outputs;
+	}
+
+	public void addInput(Arc arc){
+		this.inputs.add(arc);
+	}
+
+	public void addOutput(Arc arc){
+		this.outputs.add(arc);
 	}
 
 }

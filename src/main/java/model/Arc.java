@@ -29,7 +29,8 @@ public class Arc {
 	 * TODO: Implement this so the arc basically moves the tokens (weight) from it's origin to it's destination
 	 */
 	public void fire() {
-		
+		this.getOrigin().removeTokens(this.weight);
+		this.getDestination().addTokens(this.weight);
 	}
 
 	public void setWeight(int weight) {
@@ -54,5 +55,10 @@ public class Arc {
 
 	public NetworkNode getDestination() {
 		return this.destination;
+	}
+
+	@Override
+	public String toString(){
+		return origin.toString();
 	}
 }
