@@ -1,4 +1,4 @@
-package model;
+package versao1;
 
 public interface NetworkNode {
 	
