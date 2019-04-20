@@ -1,26 +1,24 @@
-package versao2.estructure;
+package version2.estructure;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import versao2.estructure.arc.ArcTransition;
+import version2.estructure.arc.ArcTransition;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
-@Builder
 public class Place {
 
-    public int tokenAmount;
+    private int tokenAmount = 0;
 
-    private List<ArcTransition> arcsWithTransitionsToGo;
+    private List<ArcTransition> arcsWithTransitionsToGoList = new ArrayList<>();
 
-    public Place(int tokenAmount, List<ArcTransition> arcsWithTransitionsToGo) {
-        this.tokenAmount = tokenAmount;
-        this.arcsWithTransitionsToGo = arcsWithTransitionsToGo;
+    public Place() {
     }
 
 }

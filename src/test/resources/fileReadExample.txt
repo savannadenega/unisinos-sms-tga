@@ -1,0 +1,13 @@
+Quantidade de lugares-3
+Quantidade de transições-2
+Lugares de entrada na transição-T:1-L:1
+Lugares de entrada na transição-T:2-L:3
+Lugares de saída da transição-T:1-L:3
+Lugares de saída da transição-T:2-L:5
+Quantidade marcas no lugar-L:1-1
+Quantidade marcas no lugar-L:3-0
+Quantidade marcas no lugar-L:5-0
+Peso do arco da transição-T:1-para o lugar-L:3-1
+Peso do arco da transição-T:2-para o lugar-L:5-1
+Peso do arco do lugar-L:1-para a transição-T:1-1
+Peso do arco do lugar-L:3-para a transição-T:2-1

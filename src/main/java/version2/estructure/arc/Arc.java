@@ -1,7 +1,12 @@
-package versao2.estructure.arc;
+package version2.estructure.arc;
 
-public interface Arc {
+import lombok.Getter;
+import lombok.Setter;
 
-    int weight = 1;
+@Getter
+@Setter
+public class Arc {
+
+    private WeightArc weightArc = new WeightArc();
 
 }

@@ -1,24 +1,24 @@
-package versao2.estructure.arc;
+package version2.estructure.arc;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import versao2.estructure.Place;
+import version2.estructure.Place;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @ToString
-@Builder
-public class ArcPlace implements Arc {
+public class ArcPlace extends Arc {
 
-    private List<Place> placesToGo;
-    private List<Place> placesBefore;
+    private Integer transitionName;
 
-    public ArcPlace(List<Place> placesToGo, List<Place> placesBefore) {
-        this.placesToGo = placesToGo;
-        this.placesBefore = placesBefore;
+    private List<Place> placeList = new ArrayList<>();
+
+    public ArcPlace(Integer transitionName) {
+        this.transitionName = transitionName;
     }
+
 }

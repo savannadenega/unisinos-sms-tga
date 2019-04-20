@@ -1,33 +1,45 @@
-package versao2;
+package version2;
+
+import version2.rules.PetriNet;
+
+import java.util.Scanner;
 
 public class App {
+
+
 
     private App() {
     }
 
     public static void main(String[] args) {
 
-        //ler de um arquivo txt
+        Scanner scanner = new Scanner(System.in);
+        PetriNet petriNet = new PetriNet();
+
+        petriNet.buildPetriNetfromTxtFile(System.getProperty("user.dir") + "/src/test/resources/fileReadExample.txt");
         //OU
-        //ler do teclado de forma iterativa
-        //ir adicionando no PedriNetStructure
-        //depois PedriNetStructure.build
+        //TODO se não achar o arquivo, adicionar leitura do teclado de forma iterativa, usando métodos da PetriNet
+        //petriNet.buildPetriNetFromInteractiveInput();
 
-        //montar a rede a partir dessa leitura
+        //esperando clicar ENTER para rodar a transicao
+        //cada vez que rodar a transição, passar tokens (de acordo com o peso de cada arco) de cada place para transitions (em todos os places)
+        while (true) {
+            String input = scanner.nextLine();
+            if (!input.equals("")) {
 
-        boolean systemRunning = true;
-        while (systemRunning) {
+                //TODO perguntar se deseja salvar a rede em um arquivo externo txt
 
+            } else {
 
-            //esperando clicar ENTER para rodar a transicao
-            //cada vez que rodar a transição, passar tokens (de acordo com o peso de cada arco) de cada place para transitions (em todos os places)
+                petriNet.fire();
+                //TODO imprimir transição no log
 
-            //imprimir transição
-
-            //perguntar se deseja salvar a rede em um arquivo externo txt
-
+                break;
+            }
         }
 
     }
+
+
 
 }
