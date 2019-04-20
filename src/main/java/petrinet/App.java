@@ -1,6 +1,6 @@
-package version2;
+package petrinet;
 
-import version2.rules.PetriNet;
+import petrinet.rules.PetriNet;
 
 import java.util.Scanner;
 

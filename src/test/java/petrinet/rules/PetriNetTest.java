@@ -1,7 +1,8 @@
-package version2.rules;
+package petrinet.rules;
 
 import org.junit.Assert;
 import org.junit.Test;
+import petrinet.rules.PetriNet;
 
 public class PetriNetTest {
 

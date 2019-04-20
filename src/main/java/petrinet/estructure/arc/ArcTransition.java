@@ -1,4 +1,4 @@
-package version2.estructure.arc;
+package petrinet.estructure.arc;
 
 import lombok.Getter;
 import lombok.Setter;

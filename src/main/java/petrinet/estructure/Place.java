@@ -1,10 +1,9 @@
-package version2.estructure;
+package petrinet.estructure;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import version2.estructure.arc.ArcTransition;
+import petrinet.estructure.arc.ArcTransition;
 
 import java.util.ArrayList;
 import java.util.List;

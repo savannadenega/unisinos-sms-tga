@@ -1,4 +1,4 @@
-package version2.rules;
+package petrinet.rules;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

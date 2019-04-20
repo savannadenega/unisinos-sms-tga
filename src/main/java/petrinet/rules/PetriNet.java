@@ -1,20 +1,19 @@
-package version2.rules;
+package petrinet.rules;
 
 import lombok.Getter;
-import version2.estructure.Place;
-import version2.estructure.Transition;
-import version2.estructure.arc.ArcPlace;
+import petrinet.estructure.Transition;
+import petrinet.estructure.arc.WeightArc;
+import petrinet.estructure.Place;
+import petrinet.estructure.arc.ArcPlace;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import version2.estructure.arc.ArcTransition;
-import version2.estructure.arc.WeightArc;
+import petrinet.estructure.arc.ArcTransition;
 
 @Getter
 public class PetriNet {
