@@ -1,9 +1,9 @@
-package petrinet.estructure.arc;
+package petrinet.structure.arc;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import petrinet.estructure.Place;
+import petrinet.structure.Place;
 
 import java.util.ArrayList;
 import java.util.List;

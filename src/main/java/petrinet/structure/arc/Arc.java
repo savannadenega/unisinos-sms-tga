@@ -1,4 +1,4 @@
-package petrinet.estructure.arc;
+package petrinet.structure.arc;
 
 import lombok.Getter;
 import lombok.Setter;
