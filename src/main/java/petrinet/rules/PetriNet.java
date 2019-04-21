@@ -2,6 +2,7 @@ package petrinet.rules;
 
 import lombok.Getter;
 import petrinet.structure.Transition;
+import petrinet.structure.arc.ArcTransition;
 import petrinet.structure.arc.WeightArc;
 import petrinet.structure.Place;
 import petrinet.structure.arc.ArcPlace;
@@ -10,20 +11,18 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-
-import petrinet.structure.arc.ArcTransition;
 
 @Getter
 public class PetriNet {
 
-    Map<Integer, Place> placeHashMap = new HashMap<>();
-    Map<Integer, Transition> transitionHashMap = new HashMap<>();
-    Map<String, ArcPlace> arcPlaceHashMap = new HashMap<>();
-    Map<String, ArcTransition> arcTransitionHashMap = new HashMap<>();
-    //TODO fazer padrão de hash para weightArcHashMap, padrão é L:T
-    Map<String, WeightArc> weightArcHashMap = new HashMap<>();
+    Map<Integer, Place> placeLinkedHashMap = new LinkedHashMap<>();
+    LinkedHashMap<Integer, Transition> transitionLinkedHashMap = new LinkedHashMap<>();
+    Map<String, ArcPlace> arcPlaceLinkedHashMap = new LinkedHashMap<>();
+    Map<String, ArcTransition> arcTransitionLinkedHashMap = new LinkedHashMap<>();
+    //TODO fazer classe padrão de hash para weightArcLinkedHashMap, padrão é L:T
+    Map<String, WeightArc> weightArcLinkedHashMap = new LinkedHashMap<>();
 
     public PetriNet() {
     }
@@ -73,6 +72,9 @@ public class PetriNet {
                 case "Peso do arco do lugar":
                     bindPesoDoArcoDoLugar(linhaAtualPartes);
                     break;
+
+                default:
+                    break;
             }
 
             try {
@@ -111,29 +113,27 @@ public class PetriNet {
         lArray = linhaAtualPartes[2].split(":");
         lPosition = Integer.parseInt(lArray[1]);
 
-        Transition transition = transitionHashMap.get(tPosition);
+        Transition transition = transitionLinkedHashMap.get(tPosition);
         if (transition == null) {
             transition = new Transition();
-            transitionHashMap.put(tPosition, transition);
+            transitionLinkedHashMap.put(tPosition, transition);
         }
 
-        Place place = placeHashMap.get(lPosition);
+        Place place = placeLinkedHashMap.get(lPosition);
         if (place == null) {
             place = new Place();
-            placeHashMap.put(lPosition, place);
+            placeLinkedHashMap.put(lPosition, place);
         }
 
-        ArcTransition arcTransition = new ArcTransition(lPosition);
-        arcTransition.getTransitionsToGoList().add(tPosition);
-        arcTransitionHashMap.put(lPosition + ":" + tPosition, arcTransition);
+        ArcTransition arcTransition = new ArcTransition(tPosition);
+        arcTransitionLinkedHashMap.put(lPosition + ":" + tPosition, arcTransition);
 
-        place.getArcsWithTransitionsToGoList().add(arcTransitionHashMap.get(lPosition + ":" + tPosition));
+        place.getArcsWithTransitionsToGoList().add(arcTransitionLinkedHashMap.get(lPosition + ":" + tPosition));
 
-        ArcPlace arcPlace = new ArcPlace(tPosition);
-        arcPlace.getPlaceList().add(placeHashMap.get(lPosition));
-        arcPlaceHashMap.put(tPosition + ":" + lPosition, arcPlace);
+        ArcPlace arcPlace = new ArcPlace(placeLinkedHashMap.get(lPosition));
+        arcPlaceLinkedHashMap.put(tPosition + ":" + lPosition, arcPlace);
 
-        transition.getArcPlaceWithPlacesBeforeList().add(arcPlaceHashMap.get(tPosition + ":" + lPosition));
+        transition.getArcPlaceWithPlacesBeforeList().add(arcPlaceLinkedHashMap.get(tPosition + ":" + lPosition));
 
     }
 
@@ -150,23 +150,22 @@ public class PetriNet {
         lArray = linhaAtualPartes[2].split(":");
         lPosition = Integer.parseInt(lArray[1]);
 
-        Transition transition = transitionHashMap.get(tPosition);
+        Transition transition = transitionLinkedHashMap.get(tPosition);
         if (transition == null) {
             transition = new Transition();
-            transitionHashMap.put(tPosition, transition);
+            transitionLinkedHashMap.put(tPosition, transition);
         }
 
-        Place place = placeHashMap.get(lPosition);
+        Place place = placeLinkedHashMap.get(lPosition);
         if (place == null) {
             place = new Place();
-            placeHashMap.put(lPosition, place);
+            placeLinkedHashMap.put(lPosition, place);
         }
 
-        ArcPlace arcPlace = new ArcPlace(tPosition);
-        arcPlace.getPlaceList().add(placeHashMap.get(lPosition));
-        arcPlaceHashMap.put(tPosition + ":" + lPosition, arcPlace);
+        ArcPlace arcPlace = new ArcPlace(placeLinkedHashMap.get(lPosition));
+        arcPlaceLinkedHashMap.put(tPosition + ":" + lPosition, arcPlace);
 
-        transition.getArcPlaceWithPlacesToGoList().add(arcPlaceHashMap.get(tPosition + ":" + lPosition));
+        transition.getArcPlaceWithPlacesToGoList().add(arcPlaceLinkedHashMap.get(tPosition + ":" + lPosition));
 
     }
 
@@ -177,7 +176,7 @@ public class PetriNet {
 
         int tokenAmount = Integer.parseInt(linhaAtualPartes[2]);
 
-        Place place = placeHashMap.get(lPosition);
+        Place place = placeLinkedHashMap.get(lPosition);
         if (place != null) {
             place.setTokenAmount(tokenAmount);
         }
@@ -194,15 +193,15 @@ public class PetriNet {
 
         int arcWeight = Integer.parseInt(linhaAtualPartes[4]);
 
-        WeightArc weightArc = weightArcHashMap.get(lPosition + ":" + tPosition);
+        WeightArc weightArc = weightArcLinkedHashMap.get(lPosition + ":" + tPosition);
         if (weightArc == null) {
             weightArc = new WeightArc(arcWeight);
-            weightArcHashMap.put(lPosition + ":" + tPosition, weightArc);
+            weightArcLinkedHashMap.put(lPosition + ":" + tPosition, weightArc);
         } else {
             weightArc.setWeight(arcWeight);
         }
 
-        ArcPlace arcPlace = arcPlaceHashMap.get(tPosition + ":" + lPosition);
+        ArcPlace arcPlace = arcPlaceLinkedHashMap.get(tPosition + ":" + lPosition);
         arcPlace.setWeightArc(weightArc);
 
     }
@@ -217,67 +216,96 @@ public class PetriNet {
 
         int arcWeight = Integer.parseInt(linhaAtualPartes[4]);
 
-        WeightArc weightArc = weightArcHashMap.get(lPosition + ":" + tPosition);
+        WeightArc weightArc = weightArcLinkedHashMap.get(lPosition + ":" + tPosition);
         if (weightArc == null) {
             weightArc = new WeightArc(arcWeight);
-            weightArcHashMap.put(lPosition + ":" + tPosition, weightArc);
+            weightArcLinkedHashMap.put(lPosition + ":" + tPosition, weightArc);
         } else {
             weightArc.setWeight(arcWeight);
         }
 
-        ArcPlace arcPlace = arcPlaceHashMap.get(tPosition + ":" + lPosition);
+        ArcPlace arcPlace = arcPlaceLinkedHashMap.get(tPosition + ":" + lPosition);
         arcPlace.setWeightArc(weightArc);
 
-        ArcTransition arcTransition = arcTransitionHashMap.get(lPosition + ":" + tPosition);
+        ArcTransition arcTransition = arcTransitionLinkedHashMap.get(lPosition + ":" + tPosition);
         arcTransition.setWeightArc(weightArc);
 
     }
 
-    public void fire() {
+    public void fireOverRules() {
 
-        boolean stop = false;
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
 
-        for (Map.Entry<Integer, Transition> transition : transitionHashMap.entrySet()) {
-            for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+            if (allPlacesHaveToken(transition)) {
 
-                for (Place placeBefore : arcPlaceBefore.getPlaceList()) {
-                    if (placeBefore.getTokenAmount() < 1) {
-                        stop = true;
-                        break;
+                for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+
+                    Place placeBefore = arcPlaceBefore.getPlace();
+
+                    int weightAmountArcs = 0;
+                    for (ArcTransition arcTransition : placeBefore.getArcsWithTransitionsToGoList()) {
+                        weightAmountArcs += arcTransition.getWeightArc().getWeight();
                     }
-                }
 
-                if (stop) {
-                    break;
-                }
+                    //regra para verificar se a quantidade de tokens no place é o bastante para a quantidade de transições, se não sortear qual receber
+                    if (placeBefore.getTokenAmount() < weightAmountArcs) {
 
-                for (Place placeBefore : arcPlaceBefore.getPlaceList()) {
-
-                    int tokenAmount = placeBefore.getTokenAmount();
-                    int arcWeightPlaceBefore = arcPlaceBefore.getWeightArc().getWeight();
-
-                    if (tokenAmount >= arcWeightPlaceBefore) {
-                        placeBefore.setTokenAmount(
-                            placeBefore.getTokenAmount() - arcWeightPlaceBefore
-                        );
-
-                        for (ArcPlace arcPlaceToGo : transition.getValue().getArcPlaceWithPlacesToGoList()) {
-                            for (Place placeToGo : arcPlaceToGo.getPlaceList()) {
-
-                                int arcWeightPlaceToGo = arcPlaceToGo.getWeightArc().getWeight();
-
-                                placeToGo.setTokenAmount(
-                                    placeToGo.getTokenAmount() + arcWeightPlaceToGo
-                                );
-                            }
+                        for (int i = 0; i < placeBefore.getTokenAmount(); i++) {
+                            int random = (int) (Math.random() * (placeBefore.getArcsWithTransitionsToGoList().size()) + 0);
+                            Transition transitionRandomToBeFired = getElementByIndex(transitionLinkedHashMap, random);
+                            fire(transitionRandomToBeFired, arcPlaceBefore);
                         }
-                    }
 
+                    } else {
+                        fire(transition.getValue(), arcPlaceBefore);
+                    }
                 }
             }
-
         }
 
+    }
+
+    private boolean allPlacesHaveToken(Map.Entry<Integer, Transition> transition) {
+        //regra para verificar se todos os places antes da transição atual tem token, para fazer a transição
+        for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+            if (arcPlaceBefore.getPlace().getTokenAmount() < 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void fire(Transition transition, ArcPlace arcPlaceBefore) {
+
+        Place placeBefore = arcPlaceBefore.getPlace();
+
+        int tokenAmount = placeBefore.getTokenAmount();
+        int arcWeightPlaceBefore = arcPlaceBefore.getWeightArc().getWeight();
+
+        if (tokenAmount >= arcWeightPlaceBefore) {
+
+            placeBefore.setTokenAmount(
+                placeBefore.getTokenAmount() - arcWeightPlaceBefore
+            );
+
+            for (ArcPlace arcPlaceToGo : transition.getArcPlaceWithPlacesToGoList()) {
+
+                Place placeToGo = arcPlaceToGo.getPlace();
+
+                int arcWeightPlaceToGo = arcPlaceToGo.getWeightArc().getWeight();
+
+                placeToGo.setTokenAmount(
+                    placeToGo.getTokenAmount() + arcWeightPlaceToGo
+                );
+
+            }
+        }
+
+
+    }
+
+    public Transition getElementByIndex(LinkedHashMap map, int index) {
+        return (Transition) map.get((map.keySet().toArray())[index]);
     }
 
 }

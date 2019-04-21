@@ -6,8 +6,6 @@ import java.util.Scanner;
 
 public class App {
 
-
-
     private App() {
     }
 
@@ -16,7 +14,7 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         PetriNet petriNet = new PetriNet();
 
-        petriNet.buildPetriNetfromTxtFile(System.getProperty("user.dir") + "/src/test/resources/fileReadExample.txt");
+        petriNet.buildPetriNetfromTxtFile(System.getProperty("user.dir") + "/src/test/resources/fileReadExampleTestConcurrence.txt");
         //OU
         //TODO se não achar o arquivo, adicionar leitura do teclado de forma iterativa, usando métodos da PetriNet
         //petriNet.buildPetriNetFromInteractiveInput();
@@ -31,7 +29,7 @@ public class App {
 
             } else {
 
-                petriNet.fire();
+                petriNet.fireOverRules();
                 //TODO imprimir transição no log
 
                 break;

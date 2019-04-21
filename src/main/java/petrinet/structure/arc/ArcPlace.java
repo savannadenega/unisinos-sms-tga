@@ -5,20 +5,14 @@ import lombok.Setter;
 import lombok.ToString;
 import petrinet.structure.Place;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Getter
 @Setter
 @ToString
 public class ArcPlace extends Arc {
 
-    private Integer transitionName;
+    private Place place;
 
-    private List<Place> placeList = new ArrayList<>();
-
-    public ArcPlace(Integer transitionName) {
-        this.transitionName = transitionName;
+    public ArcPlace(Place place) {
+        this.place = place;
     }
-
 }
