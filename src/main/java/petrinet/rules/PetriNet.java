@@ -308,4 +308,48 @@ public class PetriNet {
         return (Transition) map.get((map.keySet().toArray())[index]);
     }
 
+    public void printCurrentStatus(int cycle) {
+        String lugar, marcas, transicao, habilitada;
+
+        System.out.println("===============================");
+        System.out.println("CICLO " + cycle);
+        // Print places info
+        System.out.println("\nLugares");
+
+        lugar =  "Lugar  ";
+        marcas = "Marcas ";
+
+        for (Map.Entry<Integer, Place> place : placeLinkedHashMap.entrySet()) {
+            lugar  += " | " + place.getKey();
+            marcas += " | " + place.getValue().getTokenAmount();
+        }
+
+        System.out.println(lugar);
+        System.out.println(marcas);
+
+        System.out.println("\nTransições");
+        transicao  = "Transição   ";
+        habilitada = "Habilitada? ";
+
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+            boolean enabled = false;
+            int tokenCountToEnable = 0;
+
+            for (ArcPlace arcPlaceToGo : transition.getValue().getArcPlaceWithPlacesToGoList()) {
+                tokenCountToEnable += arcPlaceToGo.getWeightArc().getWeight();
+            }
+
+            for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+                if (arcPlaceBefore.getPlace().getTokenAmount() >= tokenCountToEnable)
+                    enabled = true;
+            }
+
+            transicao  += " | " + transition.getKey();
+            habilitada += " | " + (enabled ? "S" : "N");
+        }
+
+        System.out.println(transicao);
+        System.out.println(habilitada);
+    }
+
 }

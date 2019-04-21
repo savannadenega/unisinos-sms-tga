@@ -1,0 +1,23 @@
+﻿Quantidade de lugares-8
+Quantidade de transições-4
+Lugares de entrada na transição-T:1-L:1
+Lugares de entrada na transição-T:2-L:2
+Lugares de entrada na transição-T:2-L:3
+Lugares de entrada na transição-T:3-L:4
+Lugares de entrada na transição-T:2-L:5
+Lugares de entrada na transição-T:4-L:6
+Lugares de entrada na transição-T:4-L:7
+Lugares de saída da transição-T:1-L:2
+Lugares de saída da transição-T:2-L:4
+Lugares de saída da transição-T:3-L:3
+Lugares de saída da transição-T:3-L:6
+Lugares de saída da transição-T:3-L:7
+Lugares de saída da transição-T:4-L:5
+Lugares de saída da transição-T:4-L:8
+Quantidade marcas no lugar-L:1-2
+Quantidade marcas no lugar-L:3-2
+Quantidade marcas no lugar-L:5-5
+Peso do arco da transição-T:3-para o lugar-L:3-2
+Peso do arco da transição-T:4-para o lugar-L:5-3
+Peso do arco do lugar-L:3-para a transição-T:2-2
+Peso do arco do lugar-L:5-para a transição-T:2-3
