@@ -7,12 +7,10 @@ import petrinet.structure.arc.WeightArc;
 import petrinet.structure.Place;
 import petrinet.structure.arc.ArcPlace;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 @Getter
 public class PetriNet {
@@ -23,6 +21,9 @@ public class PetriNet {
     Map<String, ArcTransition> arcTransitionLinkedHashMap = new LinkedHashMap<>();
     //TODO fazer classe padrão de hash para weightArcLinkedHashMap, padrão é L:T
     Map<String, WeightArc> weightArcLinkedHashMap = new LinkedHashMap<>();
+
+    int positionTransition = 0;
+    int cycle = 0;
 
     public PetriNet() {
     }
@@ -51,6 +52,8 @@ public class PetriNet {
             //compara o primeiro item da quebra
             //TODO fazer uma pattern factory, para cada montagem uma strategy
 
+            //TODO extrair esses dois métodos de input para a classe input
+            //TODO para o método de leitura do TXT, para cada método de bind dessa classe aqui, extrair o trecho de código split e fazer um método intermediador com o split, depois chamar o bind dessa classe aqui
             switch (linhaAtualPartes[0]) {
 
                 case "Lugares de entrada na transição":
@@ -86,20 +89,6 @@ public class PetriNet {
 
     }
 
-    private void buildPetriNetFromInteractiveInput(String input) {
-        //TODO extrair esses dois métodos de input para a classe input
-        //TODO para o método de leitura do TXT, para cada método de bind dessa classe aqui, extrair o trecho de código split e fazer um método intermediador com o split, depois chamar o bind dessa classe aqui
-
-        //TODO para esse método aqui, fazer chamadas a modo de ir passando os parâmetros necessários para os métodos bind
-//        Scanner ler = new Scanner(System.in);
-
-//        System.out.printf("Informe o nome de arquivo texto:\n");
-//        String nome = ler.nextLine();
-
-//        System.out.printf("\nConteúdo do arquivo texto:\n");
-
-    }
-
     protected void bindLugaresDeEntradaNaTransicao(String[] linhaAtualPartes) {
 
         String[] tArray;
@@ -131,9 +120,9 @@ public class PetriNet {
         place.getArcsWithTransitionsToGoList().add(arcTransitionLinkedHashMap.get(lPosition + ":" + tPosition));
 
         ArcPlace arcPlace = new ArcPlace(placeLinkedHashMap.get(lPosition));
-        arcPlaceLinkedHashMap.put(tPosition + ":" + lPosition, arcPlace);
+        arcPlaceLinkedHashMap.put(lPosition + ":" + tPosition, arcPlace);
 
-        transition.getArcPlaceWithPlacesBeforeList().add(arcPlaceLinkedHashMap.get(tPosition + ":" + lPosition));
+        transition.getArcPlaceWithPlacesBeforeList().add(arcPlaceLinkedHashMap.get(lPosition + ":" + tPosition));
 
     }
 
@@ -224,7 +213,7 @@ public class PetriNet {
             weightArc.setWeight(arcWeight);
         }
 
-        ArcPlace arcPlace = arcPlaceLinkedHashMap.get(tPosition + ":" + lPosition);
+        ArcPlace arcPlace = arcPlaceLinkedHashMap.get(lPosition + ":" + tPosition);
         arcPlace.setWeightArc(weightArc);
 
         ArcTransition arcTransition = arcTransitionLinkedHashMap.get(lPosition + ":" + tPosition);
@@ -234,11 +223,31 @@ public class PetriNet {
 
     public void fireOverRules() {
 
-        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+        if (cycle == 0) {
+            printCurrentStatus(cycle);
+        }
+        cycle++;
 
-            if (allPlacesHaveToken(transition)) {
+        Transition transition = getElementByIndex(transitionLinkedHashMap, positionTransition);
 
-                for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+        if (allPlacesHaveToken(transition)) {
+
+            int indexPlus = 1;
+            for (ArcPlace arcPlaceBefore : transition.getArcPlaceWithPlacesBeforeList()) {
+
+                if (positionTransition == (transitionLinkedHashMap.size() - 1)) {
+                    indexPlus = 0;
+                }
+
+                if (arcPlaceBefore.isEnabledToFire() == false) {
+                    transition = getElementByIndex(transitionLinkedHashMap, positionTransition + indexPlus);
+                    break;
+                }
+            }
+
+            for (ArcPlace arcPlaceBefore : transition.getArcPlaceWithPlacesBeforeList()) {
+
+                if (arcPlaceBefore.isEnabledToFire()) {
 
                     Place placeBefore = arcPlaceBefore.getPlace();
 
@@ -257,21 +266,47 @@ public class PetriNet {
                         }
 
                     } else {
-                        fire(transition.getValue(), arcPlaceBefore);
+                        fire(transition, arcPlaceBefore);
                     }
                 }
+                arcPlaceBefore.setEnabledToFire(false);
+
             }
         }
 
+        for (ArcPlace arcPlaceToGo : transition.getArcPlaceWithPlacesToGoList()) {
+            arcPlaceToGo.setFired(false);
+        }
+
+        printCurrentStatus(cycle);
+
+        if (positionTransition >= transitionLinkedHashMap.size() - 1) {
+            positionTransition = 0;
+        }
+        positionTransition++;
+
     }
 
-    private boolean allPlacesHaveToken(Map.Entry<Integer, Transition> transition) {
+    private boolean allPlacesHaveToken(Transition transition) {
+
+        isTransitionAble(transition);
+
+        for (ArcPlace arcPlaceBefore : transition.getArcPlaceWithPlacesBeforeList()) {
+            arcPlaceBefore.setEnabledToFire(true);
+        }
+
+        return true;
+    }
+
+    private boolean isTransitionAble(Transition transition) {
+
         //regra para verificar se todos os places antes da transição atual tem token, para fazer a transição
-        for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+        for (ArcPlace arcPlaceBefore : transition.getArcPlaceWithPlacesBeforeList()) {
             if (arcPlaceBefore.getPlace().getTokenAmount() < 1) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -288,7 +323,12 @@ public class PetriNet {
                 placeBefore.getTokenAmount() - arcWeightPlaceBefore
             );
 
+
             for (ArcPlace arcPlaceToGo : transition.getArcPlaceWithPlacesToGoList()) {
+
+                if (arcPlaceToGo.isFired()) {
+                    break;
+                }
 
                 Place placeToGo = arcPlaceToGo.getPlace();
 
@@ -297,6 +337,8 @@ public class PetriNet {
                 placeToGo.setTokenAmount(
                     placeToGo.getTokenAmount() + arcWeightPlaceToGo
                 );
+
+                arcPlaceToGo.setFired(true);
 
             }
         }
@@ -309,6 +351,10 @@ public class PetriNet {
     }
 
     public void printCurrentStatus(int cycle) {
+
+
+
+
         String lugar, marcas, transicao, habilitada;
 
         System.out.println("===============================");
@@ -316,11 +362,11 @@ public class PetriNet {
         // Print places info
         System.out.println("\nLugares");
 
-        lugar =  "Lugar  ";
+        lugar = "Lugar  ";
         marcas = "Marcas ";
 
         for (Map.Entry<Integer, Place> place : placeLinkedHashMap.entrySet()) {
-            lugar  += " | " + place.getKey();
+            lugar += " | " + place.getKey();
             marcas += " | " + place.getValue().getTokenAmount();
         }
 
@@ -328,28 +374,145 @@ public class PetriNet {
         System.out.println(marcas);
 
         System.out.println("\nTransições");
-        transicao  = "Transição   ";
+        transicao = "Transição   ";
         habilitada = "Habilitada? ";
 
+
         for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
-            boolean enabled = false;
-            int tokenCountToEnable = 0;
 
-            for (ArcPlace arcPlaceToGo : transition.getValue().getArcPlaceWithPlacesToGoList()) {
-                tokenCountToEnable += arcPlaceToGo.getWeightArc().getWeight();
-            }
+            transicao += " | " + transition.getKey();
+            habilitada += " | " + (isTransitionAble(transition.getValue()) ? "S" : "N");
 
-            for (ArcPlace arcPlaceBefore : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
-                if (arcPlaceBefore.getPlace().getTokenAmount() >= tokenCountToEnable)
-                    enabled = true;
-            }
-
-            transicao  += " | " + transition.getKey();
-            habilitada += " | " + (enabled ? "S" : "N");
         }
 
         System.out.println(transicao);
         System.out.println(habilitada);
+
+        int transitionsEnable = 0;
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+
+            if (!isTransitionAble(transition.getValue())) {
+                transitionsEnable++;
+            }
+
+        }
+
+
+        if (transitionsEnable == transitionLinkedHashMap.size()) {
+            System.out.println("\n\n===============================");
+            System.out.println("\n **** Final da execução, deseja salvar um arquivo com o resultado? ****");
+            System.out.println(" Digite:\n");
+            System.out.println(" S + ENTER - Para salvar e sair");
+            System.out.println(" ENTER - Para sair");
+
+            Scanner scanner = new Scanner(System.in);
+            String input = scanner.nextLine();
+
+            if (input.equalsIgnoreCase("S")) {
+
+                writePetriNetFile(System.getProperty("user.dir") + "/src/main/resources/petrinetresult/PetriNetResult.txt");
+
+            }
+
+            System.exit(0);
+        }
+
     }
+
+    public void writePetriNetFile(String path) {
+
+        FileWriter write = null;
+        try {
+            write = new FileWriter(path, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        PrintWriter printLine = new PrintWriter(write);
+
+        String keyLugaresEntrada = "";
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+
+            for (ArcPlace arcPlaceBeforeThisTransition : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+
+                for (Map.Entry<String, ArcPlace> arcPlaceLinkedHashMap : arcPlaceLinkedHashMap.entrySet()) {
+                    if (arcPlaceBeforeThisTransition.equals(arcPlaceLinkedHashMap.getValue())) {
+                        keyLugaresEntrada = arcPlaceLinkedHashMap.getKey();
+                        break;
+                    }
+                }
+
+                String[] names = keyLugaresEntrada.split(":");
+
+                printLine.println("Lugares de entrada na transição-T:" + transition.getKey() + "-L:" + names[0]);
+
+            }
+        }
+
+        String keyLugaresSaida = "";
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+
+            for (ArcPlace arcPlaceToGoThisTransition : transition.getValue().getArcPlaceWithPlacesToGoList()) {
+
+                for (Map.Entry<String, ArcPlace> arcPlaceLinkedHashMap : arcPlaceLinkedHashMap.entrySet()) {
+                    if (arcPlaceToGoThisTransition.equals(arcPlaceLinkedHashMap.getValue())) {
+                        keyLugaresSaida = arcPlaceLinkedHashMap.getKey();
+                        break;
+                    }
+                }
+
+                String[] names = keyLugaresSaida.split(":");
+
+                printLine.println("Lugares de saída da transição-T:" + transition.getKey() + "-L:" + names[1]);
+
+            }
+        }
+
+        for (Map.Entry<Integer, Place> place : placeLinkedHashMap.entrySet()) {
+
+            if(place.getValue().getTokenAmount() > 1){
+                printLine.println("Quantidade marcas no lugar-L:" + place.getKey() + "-" + place.getValue().getTokenAmount());
+            }
+
+        }
+
+        Integer placeIndex = 0;
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+
+            for (ArcPlace arcPlaceToGoThisTransition : transition.getValue().getArcPlaceWithPlacesToGoList()) {
+
+                for (Map.Entry<Integer, Place> placeLinked : placeLinkedHashMap.entrySet()) {
+                    if (placeLinked.getValue().equals(arcPlaceToGoThisTransition.getPlace())) {
+                        placeIndex = placeLinked.getKey();
+                        break;
+                    }
+                }
+
+                if(arcPlaceToGoThisTransition.getWeightArc().getWeight() > 1) {
+                    printLine.println("Peso do arco da transição-T:" + transition.getKey() + "-para o lugar-L:" + placeIndex + "-" + arcPlaceToGoThisTransition.getWeightArc().getWeight());
+                }
+            }
+        }
+
+        for (Map.Entry<Integer, Transition> transition : transitionLinkedHashMap.entrySet()) {
+
+            for (ArcPlace arcPlaceBeforeThisTransition : transition.getValue().getArcPlaceWithPlacesBeforeList()) {
+
+                for (Map.Entry<Integer, Place> placeLinked : placeLinkedHashMap.entrySet()) {
+                    if (placeLinked.getValue().equals(arcPlaceBeforeThisTransition.getPlace())) {
+                        placeIndex = placeLinked.getKey();
+                        break;
+                    }
+                }
+                if(arcPlaceBeforeThisTransition.getWeightArc().getWeight() > 1) {
+                    printLine.println("Peso do arco do lugar-L:" + placeIndex + "-para a transição-T:" + transition.getKey() + "-" + arcPlaceBeforeThisTransition.getWeightArc().getWeight());
+                }
+            }
+        }
+
+        printLine.close();
+
+    }
+
 
 }

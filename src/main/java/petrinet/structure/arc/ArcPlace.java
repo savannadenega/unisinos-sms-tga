@@ -12,7 +12,12 @@ public class ArcPlace extends Arc {
 
     private Place place;
 
+    private boolean isEnabledToFire = false;
+
+    private boolean fired = false;
+
     public ArcPlace(Place place) {
         this.place = place;
     }
+
 }

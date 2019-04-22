@@ -14,31 +14,21 @@ public class App {
         Scanner scanner = new Scanner(System.in);
         PetriNet petriNet = new PetriNet();
 
-        petriNet.buildPetriNetfromTxtFile(System.getProperty("user.dir") + "/src/test/resources/petriNet.txt");
-        //OU
-        //TODO se não achar o arquivo, adicionar leitura do teclado de forma iterativa, usando métodos da PetriNet
-        //petriNet.buildPetriNetFromInteractiveInput();
+        petriNet.buildPetriNetfromTxtFile(System.getProperty("user.dir") + "/src/test/resources/fileReadExamplePetriNetComplex.txt");
+        System.out.println("\n**** Leitura do arquivo realizada com sucesso ****\n");
 
         //esperando clicar ENTER para rodar a transicao
         //cada vez que rodar a transição, passar tokens (de acordo com o peso de cada arco) de cada place para transitions (em todos os places)
-
-        int cycle = 1;
-        petriNet.printCurrentStatus(cycle);
+        System.out.println("**** Clique em [ENTER] para executar cada ciclo ****");
 
         while (true) {
-            cycle++;
+
             String input = scanner.nextLine();
-            if (!input.equals("S")) {
 
-                //TODO perguntar se deseja salvar a rede em um arquivo externo txt
-
-            } else {
-
+            if (input.equals("")) {
                 petriNet.fireOverRules();
-
-                petriNet.printCurrentStatus(cycle);
-
             }
+
         }
 
     }
